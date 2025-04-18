@@ -3,51 +3,57 @@ using Rocket.Core.Logging;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
+using System.ComponentModel;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace handsInventorySize
 {
-    public class HandsInventorySize : RocketPlugin<Configuration>
+    public class HandsInventorySize : RocketPlugin<HandsInventorySizeConfiguration>
     {
         public static HandsInventorySize Instance;
 
         protected override void Load()
         {
-            HandsInventorySize.Instance = this;
-
+            Instance = this;
             UnturnedPlayerEvents.OnPlayerUpdateGesture += GestureChange;
-
-            Logger.LogWarning("++++++++++++++++++++++++++++++++++++++");
-            Logger.LogWarning($"[{Name}] has been loaded! ");
-            Logger.LogWarning("Dev: MQS#7816");
-            Logger.LogWarning("Join this Discord for Support: https://discord.gg/Ssbpd9cvgp");
-            Logger.LogWarning("++++++++++++++++++++++++++++++++++++++");
+            Logger.Log($"[{Name}] has been loaded!");
         }
 
         protected override void Unload()
         {
-            HandsInventorySize.Instance = null;
-
+            Instance = null;
             UnturnedPlayerEvents.OnPlayerUpdateGesture -= GestureChange;
-
-            Logger.LogWarning("++++++++++++++++++++++++++++++++++++++");
-            Logger.LogWarning($"[{Name}] has been unloaded! ");
-            Logger.LogWarning("++++++++++++++++++++++++++++++++++++++");
+            Logger.LogWarning($"[{Name}] has been unloaded!");
         }
 
         private void GestureChange(UnturnedPlayer player, UnturnedPlayerEvents.PlayerGesture gesture)
         {
-            if (gesture == UnturnedPlayerEvents.PlayerGesture.InventoryOpen)
+            if (gesture != UnturnedPlayerEvents.PlayerGesture.InventoryOpen) return;
+
+            if (player.GetPermissions().Any(x => x.Name == "modifier.ignore"))
+                return;
+
+            // default size
+            int width = Configuration.Instance.Beta.Width;
+            int height = Configuration.Instance.Beta.Height;
+
+            if (player.HasPermission("container.sigma")) 
             {
-                {
-                    if (player.GetPermissions().Any(x => x.Name == "modifier.ignore"))
-                    {
-                        return;
-                    }
-                    player.Inventory.items[2].resize(Configuration.Instance.Width, Configuration.Instance.Height);
-                }
+                width = Configuration.Instance.Sigma.Width;
+                height = Configuration.Instance.Sigma.Height;
             }
+            else if (player.HasPermission("container.kappa"))
+            {
+                width = Configuration.Instance.Kappa.Width;
+                height = Configuration.Instance.Kappa.Height;
+            }
+            else if (player.HasPermission("container.beta"))
+            {
+                width = Configuration.Instance.Beta.Width;
+                height = Configuration.Instance.Beta.Height;
+            }
+
+            player.Inventory.items[2].resize((byte)width, (byte)height);
         }
     }
 }
