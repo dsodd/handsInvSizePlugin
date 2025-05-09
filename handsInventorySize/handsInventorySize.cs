@@ -33,7 +33,7 @@ namespace handsInventorySize
             if (player.GetPermissions().Any(x => x.Name == "modifier.ignore"))
                 return;
 
-            // default size ()
+            // default size
             int width = Configuration.Instance.Beta.Width;
             int height = Configuration.Instance.Beta.Height;
 
