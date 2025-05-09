@@ -37,7 +37,7 @@ namespace handsInventorySize
             int width = Configuration.Instance.Beta.Width;
             int height = Configuration.Instance.Beta.Height;
 
-            if (player.HasPermission("container.sigma")) 
+            if (player.HasPermission("container.sigma"))   
             {
                 width = Configuration.Instance.Sigma.Width;
                 height = Configuration.Instance.Sigma.Height;
